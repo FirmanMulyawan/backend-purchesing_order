@@ -1,0 +1,53 @@
+create table employee(
+  employee_id serial primary key,
+  password varchar(50),
+  email varchar(50),
+  fullname varchar(50) unique not null,
+  position varchar(50)
+);
+
+create table contract (
+  contract_id serial primary key,
+  vendor_name varchar(50),
+  contract_start_date varchar(50),
+  contract_end_date varchar(50),
+  currency varchar(50),
+  plant varchar(50)
+);
+
+create table item (
+  item_id serial primary key,
+  item_type varchar(50),
+  material varchar(50),
+  descriptiom varchar(50),
+  storage_location varchar(50),
+  quantity integer,
+  price_each integer,
+  budget_source varchar(50),
+  note varchar(200)
+);
+
+create table purchase_order(
+  po_id serial primary key,
+  contract_id integer,
+  employee_id integer,
+  item_id integer,
+  medco_representative varchar(50),
+  medco_to_provide varchar(50),
+  location varchar(50),
+  note varchar(200),
+  budget_source varchar(10),
+  price_total integer,
+  comment varchar(500),
+  po_start_date timestamp,
+  po_complete_date timestamp,
+  foreign key (contract_id) references contract (contract_id),
+  foreign key (employee_id) references employee (employee_id),
+  foreign key (item_id) references item (item_id)
+);
+
+create table comment(
+  comment_id integer,
+     comment_detail varchar(100) , 
+  foreign key (comment_id) references purchase_order (po_id)
+);

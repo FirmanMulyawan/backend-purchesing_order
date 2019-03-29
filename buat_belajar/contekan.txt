@@ -1,0 +1,305 @@
+from flask_sqlalchemy import SQLAlchemy
+db = SQLAlchemy()
+from flask_cors import CORS
+from random import randint
+from models import Employee, Contract, Item
+from flask import Flask, jsonify, request, json, make_response
+from flask_sqlalchemy import SQLAlchemy
+
+
+
+app = Flask(_name_)
+CORS(app)
+
+POSTGRES = {
+    'user': 'postgres',
+    'pw': 'fasyaemad03',
+    'db': 'purchase_order',
+    'host': 'localhost',
+    'port': '5432'
+}
+
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# postgresql://username:password@localhost:5432/database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
+
+db.init_app(app)
+
+
+# ADD EMPLOYEE ============ 
+@app.route('/addEmployee', methods=["POST"])
+def add_employee():
+
+    body = request.json
+
+    password = body['password']
+    email = body['email']
+    fullname = body['fullname']
+    position = body['position']
+
+    try:
+        employee = Employee(
+            password=password,
+            email=email,
+            fullname=fullname,
+            position=position
+        )
+
+        db.session.add(employee)
+        db.session.commit()
+        return "add employee. employee id={}".format(employee.employee_id), 200
+
+    except Exception as e:
+        return(str(e)), 400
+# ADD EMPLOYEE ============
+
+# GET ALL EMPLOYEE ===========
+@app.route('/getAllEmployee', methods=["GET"])
+def get_all_employee():
+        try:
+                employee = Employee.query.order_by(Employee.employee_id).all()
+                return jsonify([usr.serialize()
+                for usr in employee])
+        except Exception as e:
+                return (str(e))
+# GET ALL EMPLOYEE ===========
+# GET USER BY ==============
+@app.route('/getEmployeeBy/<employeeId_>', methods=["GET"])
+def get_employee_by(employeeId_):
+        try:
+                employe = Employee.query.filter_by(employee_id=employeeId_).first()
+                return jsonify(employe.serialize())
+        except Exception as e:  
+                return (str(e))
+# GET USER BY ==============
+# LOG IN ============
+@app.route('/login', methods=['POST'])
+def login():
+    response = {}
+    body = request.json
+    email = body['email']
+    password = body['password']
+    isLogin = False
+
+    try:
+        employers = get_all_employee().json
+        for employee in employers:
+            if email == employee['email']:
+                if password == employee['password']:
+                    isLogin = True
+
+    except Exception as e:
+        response['Error'] = str(e)
+        # return str(e)
+
+    if isLogin:
+        response['message'] = 'Login success, welcome {}'.format(email)
+        code = 200
+    else:
+        response['message'] = 'Login failed, username or password is wrong'
+        code = 400
+    return jsonify(response), code
+
+# LOG IN ============
+
+# ADD CONTRACT ============
+@app.route('/addContract', methods=["POST"])
+def add_contract():
+
+    body = request.json
+
+    vendor_name = body['vendor_name']
+    contract_start_date = body['contract_start_date']
+    contract_end_date = body['contract_end_date']
+    currency = body['currency']
+    plant = body['plant']
+
+
+    try:
+        contract = Contract(
+            vendor_name = vendor_name,
+            contract_start_date = contract_start_date,
+            contract_end_date = contract_end_date,
+            currency = currency,
+            plant = plant,
+        )
+
+        db.session.add(contract)
+        db.session.commit()
+        return "add contract. contract id={}".format(Contract.contract_id), 200
+
+    except Exception as e:
+        return(str(e)), 400
+# ADD CONTRACT ============
+# GET ALL CONTRACT ===========
+@app.route('/getAllContract', methods=["GET"])
+def get_all_contract():
+        try:
+                contract = Contract.query.order_by(Contract.contract_id).all()
+                return jsonify([usr.serialize()
+                for usr in contract])
+        except Exception as e:
+                return (str(e))
+# GET ALL CONTRACT ===========
+# GET USER BY ==============
+@app.route('/getContractBy/<contractId_>', methods=["GET"])
+def get_contract_by(contractId_):
+        try:
+                contract = Contract.query.filter_by(contract_id=contractId_).first()
+                return jsonify(contract.serialize())
+        except Exception as e:
+                return (str(e))
+# GET USER BY ==============
+
+# UPDATE CONTRACT ==========
+@app.route('/updateContract/<contractId_>', methods=["PUT"])
+def update_contract(contractId_):
+
+        body = request.json
+        contract_existing = get_contract_by(contractId_).json
+
+        if 'vendor_name' not in body:
+                vendor_name = user_existing['vendor_name']
+        else:
+                vendor_name = body['vendor_name']
+        if 'contract_start_date' not in body:
+                contract_start_date = user_existing['contract_start_date']
+        else:
+                contract_start_date = body['contract_start_date']
+        if 'contract_end_date' not in body:
+                contract_end_date = user_existing['contract_end_date']
+        else:
+                contract_end_date = body['contract_end_date']
+        if 'currency' not in body:
+                currency = user_existing['currency']
+        else:
+                currency = body['currency']
+        if 'plant' not in body:
+                plant = user_existing['plant']
+        else:
+                plant = body['plant']
+        try:
+                contractUpdate = {
+                    'vendor_name': vendor_name,
+                    'contract_start_date': contract_start_date,
+                    'contract_end_date': contract_end_date,
+                    'currency': currency,
+                    'plant': plant,
+
+                }
+                contract = Contract.query.filter_by(contract_id=contractId_).update(contractUpdate)
+                db.session.commit()
+                return 'update contract'
+        except Exception as e:
+                return(str(e))
+# UPDATE CONTRACT ==========
+# ADD ITEM ==================
+@app.route('/addItem', methods=["POST"])
+def add_item():
+
+    body = request.json
+    item_type = body['item_type']
+    material = body['material']
+    description = body['descriptiom']
+    storage_location = body['storage_location']
+    quantity = body['quantity']
+    price_each = body['price_each']
+    budget_source = body['budget_source']
+    note = body['note']
+
+    try:
+        item = Item(
+            item_type= item_type,
+            material=material,
+            description= description,   
+            storage_location= storage_location,
+            quantity= quantity,
+            price_each= price_each,
+            budget_source= budget_source,
+            note= note
+        )
+
+        db.session.add(item)
+        db.session.commit()
+        return "add item. item id={}".format(item.item_id), 200
+
+    except Exception as e:
+        return(str(e)), 400
+# ADD ITEM ==================
+# GET ALL ITEM ===========
+@app.route('/getAllItem', methods=["GET"])
+def get_all_item():
+        try:
+                item = Item.query.order_by(Item.item_id).all()
+                return jsonify([usr.serialize()
+                                for usr in item])
+        except Exception as e:
+                return (str(e))
+# GET ALL ITEM ===========
+# GET ITEM BY ==============
+@app.route('/getItemBy/<itemId_>', methods=["GET"])
+def get_item_by(itemId_):
+        try:
+                item = Item.query.filter_by(item_id=itemId_).first()
+                return jsonify(item.serialize())
+        except Exception as e:
+                return (str(e))
+# GET ITEM BY ==============
+# UPDATE ITEM ==========
+@app.route('/updateItem/<itemId_>', methods=["PUT"])
+def update_item(itemId_):
+
+        body = request.json
+        item_existing = get_item_by(itemId_).json
+
+        if 'item_type' not in body:
+                item_type = item_existing['item_type']
+        else:
+                item_type = body['item_type']
+        if 'material' not in body:
+                material = item_existing['material']
+        else:
+                material = body['material']
+        if 'description' not in body:
+                description = item_existing['description']
+        else:
+                description = body['description']
+        if 'storage_location' not in body:
+                storage_location = item_existing['storage_location']
+        else:
+                storage_location = body['storage_location']
+        if 'quantity' not in body:
+                quantity = item_existing['quantity']
+        else:
+                quantity = body['quantity']
+        if 'price_each' not in body:
+                price_each = item_existing['price_each']
+        else:
+                price_each = body['price_each']
+        if 'budget_source' not in body:
+                budget_source = item_existing['budget_source']
+        else:
+                budget_source = body['budget_source']
+        if 'note' not in body:
+                note = item_existing['note']
+        else:
+                note = body['note']
+        try:
+                itemUpdate = {
+                    'item_type': item_type,
+                    'material': material,
+                    'description': description,
+                    'storage_location': storage_location,
+                    'quantity': quantity,
+                    'price_each': price_each,
+                    'budget_source': budget_source,
+                    'note': note,
+
+
+                }
+                item = Item.query.filter_by(item_id=itemId_).update(itemUpdate)
+                db.session.commit()
+                return 'update item'
+        except Exception as e:
+                return(str(e))
+# UPDATE ITEM ==========

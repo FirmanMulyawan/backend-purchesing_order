@@ -21,8 +21,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:\
 db.init_app(app)
 
 
-from employee import get_all_employee
-# from option import get_all_Options
+import employee
+import contract
+import item
 # from question import get_all_Questions
 # from quizzes import get_all_Quizzes
 # from users import tesUser

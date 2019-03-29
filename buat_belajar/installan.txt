@@ -1,0 +1,13 @@
+﻿python -m venv ./this-is-the-name
+
+pip install sqlalchemy
+
+pip install flask
+
+pip list
+
+pip install psycopg2
+
+pip install -U flask-cors
+
+pip install Flask-SQLAlchemy

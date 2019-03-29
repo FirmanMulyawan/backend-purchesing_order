@@ -35,35 +35,35 @@ class Employee(db.Model):
 
 # =============================== CONTRACT ==================================================
 
-# class Contract(db.Model):
-#     __tablename__ = 'vendor'
+class Contract(db.Model):
+    __tablename__ = 'contract'
 
-#     contract_id = db.Column(db.Integer, primary_key=True)
-#     vendor_name = db.Column(db.String())
-#     contract_start_date = db.Column(db.DateTime())
-#     contract_end_date = db.Column(db.DateTime())
-#     currency = db.Column(db.String())
-#     plant = db.Column(db.String())
+    contract_id = db.Column(db.Integer, primary_key=True)
+    vendor_name = db.Column(db.String())
+    contract_start_date = db.Column(db.DateTime())
+    contract_end_date = db.Column(db.DateTime())
+    currency = db.Column(db.String())
+    plant = db.Column(db.String())
 
-#     def __init__(self, vendor_name, contract_start_date, contract_end_date, currency, plant):
-#         self.vendor_name = vendor_name
-#         self.contract_start_date = contract_start_date
-#         self.contract_end_date = contract_end_date
-#         self.currency = currency
-#         self.plant = plant
+    def __init__(self, vendor_name, contract_start_date, contract_end_date, currency, plant):
+        self.vendor_name = vendor_name
+        self.contract_start_date = contract_start_date
+        self.contract_end_date = contract_end_date
+        self.currency = currency
+        self.plant = plant
 
-#     def __repr__(self):
-#         return '<contract id {}>'.format(self.contract_id)
+    def __repr__(self):
+        return '<contract id {}>'.format(self.contract_id)
 
-#     def serialize(self):
-#         return{
-#             'contract_id': self.contract_id,
-#             'vendor_name': self.vendor_name,
-#             'contract_start_date': self.contract_start_date,
-#             'contract_end_date': self.contract_end_date,
-#             'currency': self.currency,
-#             'plant': self.plant
-#         }
+    def serialize(self):
+        return{
+            'contract_id': self.contract_id,
+            'vendor_name': self.vendor_name,
+            'contract_start_date': self.contract_start_date,
+            'contract_end_date': self.contract_end_date,
+            'currency': self.currency,
+            'plant': self.plant
+        }
 
 
 # ================================== ITEM ==================================================
